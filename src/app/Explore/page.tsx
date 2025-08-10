@@ -97,25 +97,25 @@ const mockProducts = [
     colors: ['white', 'black']
   },
 ];
-
 export default function ExplorePage() {
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
-    category: null,
-    price: null,
-    rating: null,
+    category: null as string | null,
+    price: null as string | null,
+    rating: null as string | null,
   });
   const [searchQuery, setSearchQuery] = useState('');
 
-const handleFilterChange = (filterType: string, value: string | null) => {
-  setSelectedFilters(prev => ({
-    ...prev,
-    [filterType]: prev[filterType] === value ? null : value
-  }));
-};
+  // تغيير الفلاتر
+  const handleFilterChange = (filterType: keyof typeof selectedFilters, value: string | null) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterType]: prev[filterType] === value ? null : value
+    }));
+  };
 
-
+  // تصفير الفلاتر
   const clearFilters = () => {
     setSelectedFilters({
       category: null,
@@ -125,32 +125,38 @@ const handleFilterChange = (filterType: string, value: string | null) => {
     setSearchQuery('');
   };
 
+  // فلترة المنتجات
   const filteredProducts = mockProducts.filter(product => {
+    // فلترة البحث
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    
+
+    // فلترة التصنيف
     if (selectedFilters.category && product.category !== selectedFilters.category) {
       return false;
     }
-    
+
+    // فلترة السعر
     if (selectedFilters.price) {
       const [min, max] = selectedFilters.price.split('-').map(Number);
-      if (product.price < min || product.price > max) {
+      if (isNaN(min) || isNaN(max) || product.price < min || product.price > max) {
         return false;
       }
     }
-    
+
+    // فلترة التقييم
     if (selectedFilters.rating) {
       const [minRating] = selectedFilters.rating.split('-').map(Number);
-      if (product.rating < minRating) {
+      if (isNaN(minRating) || product.rating < minRating) {
         return false;
       }
     }
-    
+
     return true;
   });
 
+  
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       <Navbar />
