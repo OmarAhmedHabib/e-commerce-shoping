@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Navbar from '@/components/navbar';
 import { ProductCard } from '@/components/ProductCard';
 import { Footer } from '@/components/footer';
+import { ReactElement } from "react";
+
 
 type Category = {
   id: number;
@@ -139,7 +141,7 @@ const mockProducts: Product[] = [
   },
 ];
 
-export default function ExplorePage(): JSX.Element {
+export default function ExplorePage(): ReactElement {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({
