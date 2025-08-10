@@ -108,12 +108,13 @@ export default function ExplorePage() {
   });
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleFilterChange = (filterType, value) => {
-    setSelectedFilters(prev => ({
-      ...prev,
-      [filterType]: prev[filterType] === value ? null : value
-    }));
-  };
+const handleFilterChange = (filterType: string, value: string | null) => {
+  setSelectedFilters(prev => ({
+    ...prev,
+    [filterType]: prev[filterType] === value ? null : value
+  }));
+};
+
 
   const clearFilters = () => {
     setSelectedFilters({
