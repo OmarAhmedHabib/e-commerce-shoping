@@ -1,55 +1,12 @@
 'use client';
-import { FiFilter, FiSearch, FiGrid, FiList, FiX } from 'react-icons/fi';
+import Link from 'next/link';
+import { FiFilter, FiSearch, FiGrid, FiList, FiStar, FiChevronDown, FiX } from 'react-icons/fi';
 import { useState } from 'react';
 import Navbar from '@/components/navbar';
 import { ProductCard } from '@/components/ProductCard';
 import { Footer } from '@/components/footer';
-import { ReactElement } from "react";
 
-
-type Category = {
-  id: number;
-  name: string;
-  slug: string;
-};
-
-type PriceFilter = {
-  id: number;
-  name: string;
-  value: string; // "min-max"
-};
-
-type RatingFilter = {
-  id: number;
-  name: string;
-  value: string; // "min-max"
-};
-
-type FiltersShape = {
-  price: PriceFilter[];
-  rating: RatingFilter[];
-};
-
-export type Product = {
-  id: string;
-  name: string;
-  price: number;
-  image?: string;
-  category: string;
-  rating: number;
-  reviews?: number;
-  isNew?: boolean;
-  colors?: string[];
-  badge?: string;
-};
-
-type SelectedFilters = {
-  category: string | null;
-  price: string | null;   // "min-max" or null
-  rating: string | null;  // "min-max" or null
-};
-
-const categories: Category[] = [
+const categories = [
   { id: 1, name: 'Electronics', slug: 'electronics' },
   { id: 2, name: 'Clothing', slug: 'clothing' },
   { id: 3, name: 'Footwear', slug: 'footwear' },
@@ -58,7 +15,7 @@ const categories: Category[] = [
   { id: 6, name: 'Beauty', slug: 'beauty' },
 ];
 
-const filters: FiltersShape = {
+const filters = {
   price: [
     { id: 1, name: 'Under $100', value: '0-100' },
     { id: 2, name: '$100 - $300', value: '100-300' },
@@ -73,7 +30,7 @@ const filters: FiltersShape = {
   ],
 };
 
-const mockProducts: Product[] = [
+const mockProducts = [
   {
     id: "1",
     name: "Wireless Headphones",
@@ -141,17 +98,17 @@ const mockProducts: Product[] = [
   },
 ];
 
-export default function ExplorePage(): ReactElement {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
-  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({
+export default function ExplorePage() {
+  const [viewMode, setViewMode] = useState('grid');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState({
     category: null,
     price: null,
     rating: null,
   });
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleFilterChange = (filterType: keyof SelectedFilters, value: string | null) => {
+  const handleFilterChange = (filterType, value) => {
     setSelectedFilters(prev => ({
       ...prev,
       [filterType]: prev[filterType] === value ? null : value
@@ -171,25 +128,25 @@ export default function ExplorePage(): ReactElement {
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-
+    
     if (selectedFilters.category && product.category !== selectedFilters.category) {
       return false;
     }
-
+    
     if (selectedFilters.price) {
       const [min, max] = selectedFilters.price.split('-').map(Number);
-      if (Number(product.price) < min || Number(product.price) > max) {
+      if (product.price < min || product.price > max) {
         return false;
       }
     }
-
+    
     if (selectedFilters.rating) {
       const [minRating] = selectedFilters.rating.split('-').map(Number);
-      if (Number(product.rating) < minRating) {
+      if (product.rating < minRating) {
         return false;
       }
     }
-
+    
     return true;
   });
 
@@ -232,8 +189,8 @@ export default function ExplorePage(): ReactElement {
             
             <div className="hidden md:flex gap-2">
               <select
-                value={selectedFilters.category ?? ''}
-                onChange={(e) => handleFilterChange('category', e.target.value || null)}
+                value={selectedFilters.category || ''}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
                 className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg"
               >
                 <option value="">All Categories</option>
@@ -245,8 +202,8 @@ export default function ExplorePage(): ReactElement {
               </select>
               
               <select
-                value={selectedFilters.price ?? ''}
-                onChange={(e) => handleFilterChange('price', e.target.value || null)}
+                value={selectedFilters.price || ''}
+                onChange={(e) => handleFilterChange('price', e.target.value)}
                 className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg"
               >
                 <option value="">All Prices</option>
@@ -258,8 +215,8 @@ export default function ExplorePage(): ReactElement {
               </select>
               
               <select
-                value={selectedFilters.rating ?? ''}
-                onChange={(e) => handleFilterChange('rating', e.target.value || null)}
+                value={selectedFilters.rating || ''}
+                onChange={(e) => handleFilterChange('rating', e.target.value)}
                 className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg"
               >
                 <option value="">All Ratings</option>
@@ -275,14 +232,12 @@ export default function ExplorePage(): ReactElement {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 ${viewMode === 'grid' ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'}`}
-                aria-label="Grid view"
               >
                 <FiGrid />
               </button>
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 ${viewMode === 'list' ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'}`}
-                aria-label="List view"
               >
                 <FiList />
               </button>
@@ -299,7 +254,6 @@ export default function ExplorePage(): ReactElement {
                 <button 
                   onClick={() => handleFilterChange('category', null)}
                   className="ml-1 mr-2"
-                  aria-label="Remove category filter"
                 >
                   <FiX size={14} />
                 </button>
@@ -312,7 +266,6 @@ export default function ExplorePage(): ReactElement {
                 <button 
                   onClick={() => handleFilterChange('price', null)}
                   className="ml-1 mr-2"
-                  aria-label="Remove price filter"
                 >
                   <FiX size={14} />
                 </button>
@@ -325,7 +278,6 @@ export default function ExplorePage(): ReactElement {
                 <button 
                   onClick={() => handleFilterChange('rating', null)}
                   className="ml-1 mr-2"
-                  aria-label="Remove rating filter"
                 >
                   <FiX size={14} />
                 </button>
@@ -338,7 +290,6 @@ export default function ExplorePage(): ReactElement {
                 <button 
                   onClick={() => setSearchQuery('')}
                   className="ml-1 mr-2"
-                  aria-label="Clear search"
                 >
                   <FiX size={14} />
                 </button>
@@ -453,7 +404,7 @@ export default function ExplorePage(): ReactElement {
             {filteredProducts.map(product => (
               <ProductCard 
                 key={product.id} 
-                product={product as any} 
+                product={product} 
                 viewMode={viewMode}
               />
             ))}
